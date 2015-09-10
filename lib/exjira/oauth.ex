@@ -26,9 +26,7 @@ defmodule ExJira.OAuth do
     token_request_url = "#{config[:site]}/plugins/servlet/oauth/request-token"
     {:ok, request_token_response} = :oauth.post(to_char_list(token_request_url), [], consumer)
 
-    updated_config = :oauth.params_decode(request_token_response) 
-                      |> get_keyword_list 
-                      |> Keyword.merge config
+    updated_config = Keyword.merge(config, :oauth.params_decode(request_token_response) |> get_keyword_list)
 
     ExJira.Config.set(updated_config)
 
@@ -40,7 +38,7 @@ defmodule ExJira.OAuth do
   """
   def get_authorize_url do
     config = ExJira.Config.get_tuples
-    :oauth.uri(to_char_list("#{config[:site]}/plugins/servletlet/oauth/authorize"), [{'oauth_token', config[:oauth_token]}])
+    :oauth.uri(to_char_list("#{config[:site]}/plugins/servlet/oauth/authorize"), [{'oauth_token', config[:oauth_token]}])
   end
 
   @doc """
@@ -53,9 +51,7 @@ defmodule ExJira.OAuth do
 
     {:ok, access_token_response} = :oauth.post(to_char_list(access_token_request_url), [], consumer, config[:oauth_token], config[:oauth_token_secret])
     
-    updated_config = :oauth.params_decode(access_token_response) 
-                      |> get_keyword_list 
-                      |> Keyword.merge config
+    updated_config = Keyword.merge(config, :oauth.params_decode(access_token_response) |> get_keyword_list)
 
     ExJira.Config.set(updated_config)
 
